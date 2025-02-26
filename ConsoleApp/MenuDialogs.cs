@@ -25,6 +25,9 @@ public class MenuDialogs(CustomerService customerService, ProjectService project
             Console.WriteLine("4. Get All Projects");
             Console.WriteLine("5. Get Customer");
             Console.WriteLine("6. get Project");
+            Console.WriteLine("7. Create Product");
+            Console.WriteLine("8. Create Status");
+            Console.WriteLine("9. Create User");
             Console.WriteLine("0. Exit");
             Console.Write("\nChoose your option: ");
 
@@ -49,6 +52,15 @@ public class MenuDialogs(CustomerService customerService, ProjectService project
                     break;
                 case "6":
                     GetProject();
+                    break;
+                case "7":
+                    CreateProduct();
+                    break;
+                case "8":
+                    CreateStatus();
+                    break;
+                case "9":
+                    CreateUser();
                     break;
                 case "0":
                     return;
@@ -174,6 +186,50 @@ public class MenuDialogs(CustomerService customerService, ProjectService project
     }
 
     public void GetProject()
+    {
+    }
+
+    public void CreateProduct()
+    {
+        Console.Clear();
+        Console.WriteLine("*** New Product ***");
+
+        Console.Write("Product name: ");
+        string productName = Console.ReadLine()!;
+
+        Console.Write("Product price: ");
+        decimal productPrice = Convert.ToDecimal(Console.ReadLine()!);
+
+        var registrationForm = new ProductForm
+        {
+            ProductName = productName,
+            Price = productPrice
+        };
+
+        var optionsBuilder = new DbContextOptionsBuilder<DataContext>();
+        optionsBuilder
+            .UseLazyLoadingProxies()
+            .UseSqlServer("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=D:\\Cources\\DataStorage_Assignment\\Data\\Databases\\Local_Db.mdf;Integrated Security=True;Connect Timeout=30;Encrypt=True");
+
+        using (var dataContext = new DataContext(optionsBuilder.Options))
+        {
+            var productRepository = new ProductRepository(dataContext);
+            var productService = new ProductService(productRepository);
+            productService.CreateProductAsync(registrationForm).Wait();
+        }
+
+        Console.WriteLine($"Product '{registrationForm.ProductName}' created successfully!");
+
+
+        Console.WriteLine("\nPress any key to return to the menu.");
+        Console.ReadKey();
+    }
+
+    public void CreateStatus()
+    {
+    }
+
+    public void CreateUser()
     {
     }
 
