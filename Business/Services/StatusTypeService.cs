@@ -15,7 +15,7 @@ public class StatusTypeService(StatusTypeRepository statusTypeRepository)
         await _statusTypeRepository.CreateAsync(statusTypeEntity!);
     }
 
-    public async Task<IEnumerable<StatusType?>> GetProductAsync()
+    public async Task<IEnumerable<StatusType?>> GetStatusTypeAsync()
     {
         var statusTypeEntities = await _statusTypeRepository.GetAllAsync();
         return statusTypeEntities.Select(StatusTypeFactory.Create);
@@ -35,7 +35,7 @@ public class StatusTypeService(StatusTypeRepository statusTypeRepository)
         return await _statusTypeRepository.UpdateAsync(statusTypeEntity!);
     }
 
-    public async Task<bool> DeleteProductAsync(int id)
+    public async Task<bool> DeleteeStatusTypeAsync(int id)
     {
         return await _statusTypeRepository.DeleteAsync(id);
     }

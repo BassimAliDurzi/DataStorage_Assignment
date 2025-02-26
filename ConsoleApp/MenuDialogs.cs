@@ -28,6 +28,9 @@ public class MenuDialogs(CustomerService customerService, ProjectService project
             Console.WriteLine("7. Create Product");
             Console.WriteLine("8. Create Status");
             Console.WriteLine("9. Create User");
+            Console.WriteLine("10. Get All Products");
+            Console.WriteLine("11. Get All StatusType");
+            Console.WriteLine("12. Get All Users");
             Console.WriteLine("0. Exit");
             Console.Write("\nChoose your option: ");
 
@@ -61,6 +64,15 @@ public class MenuDialogs(CustomerService customerService, ProjectService project
                     break;
                 case "9":
                     CreateUser();
+                    break;
+                case "10":
+                    GetAllProducts();
+                    break;
+                case "11":
+                    GetAllStatus();
+                    break;
+                case "12":
+                    GetAllUsers();
                     break;
                 case "0":
                     return;
@@ -110,7 +122,7 @@ public class MenuDialogs(CustomerService customerService, ProjectService project
     public void GetAllCustomers()
     {
         Console.Clear();
-        Console.WriteLine("*** All Customer ***");
+        Console.WriteLine("*** All Customers ***");
         Console.WriteLine("");
 
         var optionBuilder = new DbContextOptionsBuilder<DataContext>();
@@ -235,7 +247,7 @@ public class MenuDialogs(CustomerService customerService, ProjectService project
 
         var registrationForm = new StatusTypeForm
         {
-            StatusName = statusName 
+            StatusName = statusName
         };
 
         var optionsBuilder = new DbContextOptionsBuilder<DataContext>();
@@ -294,6 +306,111 @@ public class MenuDialogs(CustomerService customerService, ProjectService project
 
         Console.WriteLine($"User '{registrationForm.FirstName} {registrationForm.LastName}' created successfully!");
 
+
+        Console.WriteLine("\nPress any key to return to the menu.");
+        Console.ReadKey();
+    }
+
+    public void GetAllProducts()
+    {
+        Console.Clear();
+        Console.WriteLine("*** All Products ***");
+        Console.WriteLine("");
+
+        var optionBuilder = new DbContextOptionsBuilder<DataContext>();
+        optionBuilder
+            .UseLazyLoadingProxies()
+            .UseSqlServer("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=D:\\Cources\\DataStorage_Assignment\\Data\\Databases\\Local_Db.mdf;Integrated Security=True;Connect Timeout=30;Encrypt=True");
+
+        using (var datacontext = new DataContext(optionBuilder.Options))
+        {
+            var productRepository = new ProductRepository(datacontext);
+            var productService = new ProductService(productRepository);
+
+            var products = productService.GetProductAsync().GetAwaiter().GetResult();
+
+            if (products.Count() > 0)
+            {
+                foreach (var product in products)
+                {
+                    Console.WriteLine($"Id: {product?.Id}, Name: {product?.ProductName}, Price: {product?.Price}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("There is no product in the list.");
+            }
+        }
+
+        Console.WriteLine("\nPress any key to return to the menu.");
+        Console.ReadKey();
+    }
+
+    public void GetAllStatus()
+    {
+        Console.Clear();
+        Console.WriteLine("*** All Status ***");
+        Console.WriteLine("");
+
+        var optionBuilder = new DbContextOptionsBuilder<DataContext>();
+        optionBuilder
+            .UseLazyLoadingProxies()
+            .UseSqlServer("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=D:\\Cources\\DataStorage_Assignment\\Data\\Databases\\Local_Db.mdf;Integrated Security=True;Connect Timeout=30;Encrypt=True");
+
+        using (var datacontext = new DataContext(optionBuilder.Options))
+        {
+            var statusRepository = new StatusTypeRepository(datacontext);
+            var statusService = new StatusTypeService(statusRepository);
+
+            var statusTypes = statusService.GetStatusTypeAsync().GetAwaiter().GetResult();
+
+            if (statusTypes.Count() > 0)
+            {
+                foreach (var statusType in statusTypes)
+                {
+                    Console.WriteLine($"Id: {statusType?.Id}, Name: {statusType?.StatusName}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("There is no status in the list.");
+            }
+        }
+
+        Console.WriteLine("\nPress any key to return to the menu.");
+        Console.ReadKey();
+    }
+
+    public void GetAllUsers()
+    {
+        Console.Clear();
+        Console.WriteLine("*** All Users ***");
+        Console.WriteLine("");
+
+        var optionBuilder = new DbContextOptionsBuilder<DataContext>();
+        optionBuilder
+            .UseLazyLoadingProxies()
+            .UseSqlServer("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=D:\\Cources\\DataStorage_Assignment\\Data\\Databases\\Local_Db.mdf;Integrated Security=True;Connect Timeout=30;Encrypt=True");
+
+        using (var datacontext = new DataContext(optionBuilder.Options))
+        {
+            var userRepository = new UserRepository(datacontext);
+            var userService = new UserService(userRepository);
+
+            var users = userService.GetUserAsync().GetAwaiter().GetResult();
+
+            if (users.Count() > 0)
+            {
+                foreach (var user in users)
+                {
+                    Console.WriteLine($"Id: {user?.Id}, Name: {user?.FirstName} {user?.LastName}, Email: {user?.Email}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("There is no user in the list.");
+            }
+        }
 
         Console.WriteLine("\nPress any key to return to the menu.");
         Console.ReadKey();

@@ -15,14 +15,14 @@ public class UserService(UserRepository userRepository)
         await _userRepository.CreateAsync(userEntity!);
     }
 
-    public async Task<IEnumerable<User?>> GetProductAsync()
+    public async Task<IEnumerable<User?>> GetUserAsync()
     {
         var userEntities = await _userRepository.GetAllAsync();
         return userEntities.Select(UserFactory.Create);
 
     }
 
-    public async Task<User?> GetProductByIdAsync(int id)
+    public async Task<User?> GetUserByIdAsync(int id)
     {
         var userEntity = await _userRepository.GetByIdAsync(id);
         return UserFactory.Create(userEntity!);
@@ -35,7 +35,7 @@ public class UserService(UserRepository userRepository)
         return await _userRepository.UpdateAsync(userEntity!);
     }
 
-    public async Task<bool> DeleteProductAsync(int id)
+    public async Task<bool> DeleteUserAsync(int id)
     {
         return await _userRepository.DeleteAsync(id);
     }
