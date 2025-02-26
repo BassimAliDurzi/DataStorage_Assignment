@@ -73,7 +73,7 @@ public class MenuDialogs(CustomerService customerService, ProjectService project
 
         var optionsBuilder = new DbContextOptionsBuilder<DataContext>();
         optionsBuilder
-            .UseLazyLoadingProxies() // As per your OnConfiguring override
+            .UseLazyLoadingProxies()
             .UseSqlServer("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=D:\\Cources\\DataStorage_Assignment\\Data\\Databases\\Local_Db.mdf;Integrated Security=True;Connect Timeout=30;Encrypt=True");
 
         using (var dataContext = new DataContext(optionsBuilder.Options))
@@ -85,6 +85,8 @@ public class MenuDialogs(CustomerService customerService, ProjectService project
 
         Console.WriteLine($"Customer '{registrationForm.CustomerName}' created successfully!");
 
+
+        Console.WriteLine("Press any key to return to the menu.");
         Console.ReadKey();
     }
 
@@ -98,7 +100,33 @@ public class MenuDialogs(CustomerService customerService, ProjectService project
         Console.WriteLine("*** All Customer ***");
         Console.WriteLine("");
 
+        var optionBuilder = new DbContextOptionsBuilder<DataContext>();
+        optionBuilder
+            .UseLazyLoadingProxies()
+            .UseSqlServer("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=D:\\Cources\\DataStorage_Assignment\\Data\\Databases\\Local_Db.mdf;Integrated Security=True;Connect Timeout=30;Encrypt=True");
 
+        using (var datacontext = new DataContext(optionBuilder.Options))
+        {
+            var customerRepository = new CustomerRepository(datacontext);
+            var customerService = new CustomerService(customerRepository);
+
+            var customers = customerService.GetCustomersAsync().GetAwaiter().GetResult();
+
+            if (customers != null)
+            {
+                foreach (var customer in customers)
+                {
+                    Console.WriteLine($"Id: {customer.Id}, Name: {customer.CustomerName}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("There is no customer in the list.");
+            }
+        }
+
+        Console.WriteLine("\nPress any key to return to the menu.");
+        Console.ReadKey();
     }
 
     public void GetAllProjects()
