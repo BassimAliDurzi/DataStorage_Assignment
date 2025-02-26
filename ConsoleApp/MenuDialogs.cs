@@ -227,6 +227,34 @@ public class MenuDialogs(CustomerService customerService, ProjectService project
 
     public void CreateStatus()
     {
+        Console.Clear();
+        Console.WriteLine("*** New Status Type ***");
+
+        Console.Write("Status name: ");
+        string statusName = Console.ReadLine()!;
+
+        var registrationForm = new StatusTypeForm
+        {
+            StatusName = statusName 
+        };
+
+        var optionsBuilder = new DbContextOptionsBuilder<DataContext>();
+        optionsBuilder
+            .UseLazyLoadingProxies()
+            .UseSqlServer("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=D:\\Cources\\DataStorage_Assignment\\Data\\Databases\\Local_Db.mdf;Integrated Security=True;Connect Timeout=30;Encrypt=True");
+
+        using (var dataContext = new DataContext(optionsBuilder.Options))
+        {
+            var statusTypeRepository = new StatusTypeRepository(dataContext);
+            var statusTypeService = new StatusTypeService(statusTypeRepository);
+            statusTypeService.CreateStatusTypeAsync(registrationForm).Wait();
+        }
+
+        Console.WriteLine($"Status '{registrationForm.StatusName}' created successfully!");
+
+
+        Console.WriteLine("\nPress any key to return to the menu.");
+        Console.ReadKey();
     }
 
     public void CreateUser()
