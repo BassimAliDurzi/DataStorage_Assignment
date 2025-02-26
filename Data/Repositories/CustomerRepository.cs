@@ -30,7 +30,7 @@ public class CustomerRepository(DataContext context)
 
     public async Task<CustomerEntity?> GetByCustomerNameAsync(string customerName)
     {
-        return await _context.Customers.FindAsync(customerName);
+        return await _context.Customers.FirstOrDefaultAsync(c => c.CustomerName == customerName);
     }
 
     // Update

@@ -13,7 +13,7 @@ public class MenuDialogs(CustomerService customerService, ProjectService project
 {
     private readonly CustomerService _customerService = customerService;
     private readonly ProjectService _projectService = projectService;
-    private readonly DbContextOptions<DataContext>? options;
+
 
     public void MenuOptions()
     {
@@ -64,7 +64,8 @@ public class MenuDialogs(CustomerService customerService, ProjectService project
         Console.Clear();
         Console.WriteLine("*** New Customer ***");
 
-        string customerName = ValidateName("Customer name");
+        Console.Write("Customer name: ");
+        string customerName = Console.ReadLine()!;
 
         var registrationForm = new CustomerRegistrationForm
         {
@@ -86,7 +87,7 @@ public class MenuDialogs(CustomerService customerService, ProjectService project
         Console.WriteLine($"Customer '{registrationForm.CustomerName}' created successfully!");
 
 
-        Console.WriteLine("Press any key to return to the menu.");
+        Console.WriteLine("\nPress any key to return to the menu.");
         Console.ReadKey();
     }
 
@@ -112,11 +113,11 @@ public class MenuDialogs(CustomerService customerService, ProjectService project
 
             var customers = customerService.GetCustomersAsync().GetAwaiter().GetResult();
 
-            if (customers != null)
+            if (customers.Count() > 0)
             {
                 foreach (var customer in customers)
                 {
-                    Console.WriteLine($"Id: {customer.Id}, Name: {customer.CustomerName}");
+                    Console.WriteLine($"Id: {customer?.Id}, Name: {customer?.CustomerName}");
                 }
             }
             else
@@ -134,29 +135,46 @@ public class MenuDialogs(CustomerService customerService, ProjectService project
     }
     public void GetCustomer()
     {
+        Console.Clear();
+        Console.WriteLine("*** Get Customer By Name ***");
+        Console.WriteLine("");
+
+        Console.Write("Enter customer name: ");
+        string customerName = Console.ReadLine()!;
+
+        if (string.IsNullOrWhiteSpace(customerName))
+        {
+            Console.WriteLine("Customer name cannot be empty.");
+            return;
+        }
+
+        var optionBuilder = new DbContextOptionsBuilder<DataContext>();
+        optionBuilder
+            .UseLazyLoadingProxies()
+            .UseSqlServer("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=D:\\Cources\\DataStorage_Assignment\\Data\\Databases\\Local_Db.mdf;Integrated Security=True;Connect Timeout=30;Encrypt=True");
+
+        using (var datacontext = new DataContext(optionBuilder.Options))
+        {
+            var customerRepository = new CustomerRepository(datacontext);
+            var customerService = new CustomerService(customerRepository);
+            var customer = customerService.GetCustomerByCustomerNameAsync(customerName).GetAwaiter().GetResult();
+            if (customer != null)
+            {
+                Console.WriteLine($"Id: {customer.Id}, Name: {customer.CustomerName}");
+            }
+            else
+            {
+                Console.WriteLine("Customer not found.");
+            }
+        }
+
+        Console.WriteLine("\nPress any key to return to the menu.");
+        Console.ReadKey();
+
     }
 
     public void GetProject()
     {
     }
-
-    private static string ValidateName(string fieldName)
-    {
-        while (true)
-        {
-            Console.Write($"{fieldName}: ");
-            string input = (Console.ReadLine() ?? string.Empty).Trim();
-
-            if (Regex.IsMatch(input, @"^[a-zA-ZåäöÅÄÖ -]+$"))
-            {
-                return input;
-            }
-            else
-            {
-                Console.WriteLine($"Invalid {fieldName}. Field must contain letters only.");
-            }
-        }
-    }
-
 
 }
