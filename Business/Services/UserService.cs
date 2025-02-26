@@ -5,7 +5,7 @@ using Data.Repositories;
 
 namespace Business.Services;
 
-internal class UserService(UserRepository userRepository)
+public class UserService(UserRepository userRepository)
 {
     private readonly UserRepository _userRepository = userRepository;
 

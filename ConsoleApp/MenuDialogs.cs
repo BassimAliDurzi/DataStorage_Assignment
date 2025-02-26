@@ -259,6 +259,44 @@ public class MenuDialogs(CustomerService customerService, ProjectService project
 
     public void CreateUser()
     {
+        Console.Clear();
+        Console.WriteLine("*** New User ***");
+
+        Console.Write("User first name: ");
+        string usertName = Console.ReadLine()!;
+
+        Console.Write("User last name: ");
+        string userLastName = Console.ReadLine()!;
+
+        Console.Write("User email: ");
+        string userEmail = Console.ReadLine()!;
+
+
+
+        var registrationForm = new UserRegistrationForm
+        {
+            FirstName = usertName,
+            LastName = userLastName,
+            Email = userEmail
+        };
+
+        var optionsBuilder = new DbContextOptionsBuilder<DataContext>();
+        optionsBuilder
+            .UseLazyLoadingProxies()
+            .UseSqlServer("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=D:\\Cources\\DataStorage_Assignment\\Data\\Databases\\Local_Db.mdf;Integrated Security=True;Connect Timeout=30;Encrypt=True");
+
+        using (var dataContext = new DataContext(optionsBuilder.Options))
+        {
+            var userRepository = new UserRepository(dataContext);
+            var userService = new UserService(userRepository);
+            userService.CreateUserAsync(registrationForm).Wait();
+        }
+
+        Console.WriteLine($"User '{registrationForm.FirstName} {registrationForm.LastName}' created successfully!");
+
+
+        Console.WriteLine("\nPress any key to return to the menu.");
+        Console.ReadKey();
     }
 
 }

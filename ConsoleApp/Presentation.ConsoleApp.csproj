@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.2" />
+    <PackageReference Include="UmbracoCms.Core" Version="8.18.15" />
   </ItemGroup>
 
   <ItemGroup>
