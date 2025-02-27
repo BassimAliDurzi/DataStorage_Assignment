@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using Business.Dtos;
-using Business.Factories;
+﻿using Business.Dtos;
 using Business.Services;
 using Data.Contexts;
 using Data.Repositories;
@@ -24,7 +22,7 @@ public class MenuDialogs(CustomerService customerService, ProjectService project
             Console.WriteLine("3. Get All Customers");
             Console.WriteLine("4. Get All Projects");
             Console.WriteLine("5. Get Customer");
-            Console.WriteLine("6. get Project");
+            Console.WriteLine("6. Get Project");
             Console.WriteLine("7. Create Product");
             Console.WriteLine("8. Create Status");
             Console.WriteLine("9. Create User");
@@ -292,6 +290,45 @@ public class MenuDialogs(CustomerService customerService, ProjectService project
 
     public void GetProject()
     {
+        Console.Clear();
+        Console.WriteLine("*** Get Project By Title ***");
+        Console.WriteLine("");
+
+        Console.Write("Enter project title: ");
+        string projectTitle = Console.ReadLine()!;
+
+        if (string.IsNullOrWhiteSpace(projectTitle))
+        {
+            Console.WriteLine("Project title cannot be empty.");
+            return;
+        }
+
+        var optionBuilder = new DbContextOptionsBuilder<DataContext>();
+        optionBuilder
+            .UseLazyLoadingProxies()
+            .UseSqlServer("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=D:\\Cources\\DataStorage_Assignment\\Data\\Databases\\Local_Db.mdf;Integrated Security=True;Connect Timeout=30;Encrypt=True");
+
+        using (var datacontext = new DataContext(optionBuilder.Options))
+        {
+            var projectRepository = new ProjectRepository(datacontext);
+            var projectService = new ProjectService(projectRepository);
+            var project = projectService.GetProjectByProjectNameAsync(projectTitle).GetAwaiter().GetResult();
+            if (project != null)
+            {
+                Console.WriteLine($"Id: {project?.Id}, Title: {project?.Title}");
+                Console.WriteLine($"Description: {project?.Description}");
+                Console.WriteLine($"Product Id: {project?.ProductID}");
+                Console.WriteLine($"Start Date: {project?.StartDate}, End Date: {project?.EndDate}");
+                Console.WriteLine($"Customer Id: {project?.CustomerId}, Status Id: {project?.StatusId}, User Id: {project?.UserID}");
+            }
+            else
+            {
+                Console.WriteLine("Project not found.");
+            }
+        }
+
+        Console.WriteLine("\nPress any key to return to the menu.");
+        Console.ReadKey();
     }
 
     public void CreateProduct()

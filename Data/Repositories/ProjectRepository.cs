@@ -27,9 +27,9 @@ public class ProjectRepository(DataContext context)
         return await _context.Projects.FindAsync(id);
     }
 
-    public async Task<ProjectEntity?> GetByProjectNameAsync(string projectName)
+    public async Task<ProjectEntity?> GetProjectByProjectNameAsync(string projectTitle)
     {
-        return await _context.Projects.FindAsync(projectName);
+        return await _context.Projects.FirstOrDefaultAsync(p => p.Title == projectTitle);
     }
 
     // Update

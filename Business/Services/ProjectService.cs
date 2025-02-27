@@ -30,7 +30,7 @@ public class ProjectService(ProjectRepository projectRepository)
 
     public async Task<Project?> GetProjectByProjectNameAsync(string projectName)
     {
-        var projectEntity = await _projectRepository.GetByProjectNameAsync(projectName);
+        var projectEntity = await _projectRepository.GetProjectByProjectNameAsync(projectName);
         return ProjectFactory.Create(projectEntity!);
     }
 
