@@ -117,6 +117,62 @@ public class MenuDialogs(CustomerService customerService, ProjectService project
 
     public void CreateProject()
     {
+        Console.Clear();
+        Console.WriteLine("*** New Project ***");
+
+        Console.Write("Project Title: ");
+        string projectTitle = Console.ReadLine()!;
+
+        Console.Write("Project Description: ");
+        string projectDescription = Console.ReadLine()!;
+
+        Console.Write("Start Date (YYYY-MM-DD): ");
+        DateTime startDate = Convert.ToDateTime(Console.ReadLine()!);
+
+        Console.Write("End Date: (YYYY-MM-DD)");
+        DateTime endDate = Convert.ToDateTime(Console.ReadLine()!);
+
+        Console.Write("Customer Id: ");
+        int customerId = Convert.ToInt32(Console.ReadLine()!);
+
+        Console.Write("Status Id: ");
+        int statusId = Convert.ToInt32(Console.ReadLine()!);
+
+        Console.Write("User Id: ");
+        int userId = Convert.ToInt32(Console.ReadLine()!);
+
+        Console.Write("Product Id: ");
+        int productId = Convert.ToInt32(Console.ReadLine()!);
+
+        var registrationForm = new ProjectRegistrationForm
+        {
+            Title = projectTitle,
+            Description = projectDescription,
+            StartDate = startDate,
+            EndDate = endDate,
+            CustomerId = customerId,
+            StatusId = statusId,
+            UserID = userId,
+            ProductID = productId
+        };
+
+        var optionsBuilder = new DbContextOptionsBuilder<DataContext>();
+        optionsBuilder
+            .UseLazyLoadingProxies()
+            .UseSqlServer("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=D:\\Cources\\DataStorage_Assignment\\Data\\Databases\\Local_Db.mdf;Integrated Security=True;Connect Timeout=30;Encrypt=True");
+
+        using (var dataContext = new DataContext(optionsBuilder.Options))
+        {
+            var projectRepository = new ProjectRepository(dataContext);
+            var projectService = new ProjectService(projectRepository);
+            projectService.CreateProjectAsync(registrationForm).Wait();
+        }
+
+        Console.WriteLine($"Project '{registrationForm.Title}' created successfully!");
+
+
+        Console.WriteLine("\nPress any key to return to the menu.");
+        Console.ReadKey();
     }
 
     public void GetAllCustomers()
@@ -156,6 +212,43 @@ public class MenuDialogs(CustomerService customerService, ProjectService project
 
     public void GetAllProjects()
     {
+        Console.Clear();
+        Console.WriteLine("*** All Projects ***");
+        Console.WriteLine("");
+
+        var optionBuilder = new DbContextOptionsBuilder<DataContext>();
+        optionBuilder
+            .UseLazyLoadingProxies()
+            .UseSqlServer("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=D:\\Cources\\DataStorage_Assignment\\Data\\Databases\\Local_Db.mdf;Integrated Security=True;Connect Timeout=30;Encrypt=True");
+
+        using (var datacontext = new DataContext(optionBuilder.Options))
+        {
+            var projectRepository = new ProjectRepository(datacontext);
+            var projectService = new ProjectService(projectRepository);
+
+            var projects = projectService.GetProjectsAsync().GetAwaiter().GetResult();
+
+            if (projects.Count() > 0)
+            {
+                foreach (var project in projects)
+                {
+                    Console.WriteLine($"Id: {project?.Id}, Title: {project?.Title}");
+                    Console.WriteLine($"Description: {project?.Description}");
+                    Console.WriteLine($"Product Id: {project?.ProductID}");
+                    Console.WriteLine($"Start Date: {project?.StartDate}, End Date: {project?.EndDate}");
+                    Console.WriteLine($"Customer Id: {project?.CustomerId}, Status Id: {project?.StatusId}, User Id: {project?.UserID}");
+                    Console.WriteLine("------------------------------------------------------");
+
+                }
+            }
+            else
+            {
+                Console.WriteLine("There is no project in the list.");
+            }
+        }
+
+        Console.WriteLine("\nPress any key to return to the menu.");
+        Console.ReadKey();
     }
     public void GetCustomer()
     {
