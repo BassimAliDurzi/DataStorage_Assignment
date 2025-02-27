@@ -3,6 +3,7 @@ using Business.Services;
 using Data.Contexts;
 using Data.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 
 namespace Presentation.ConsoleApp;
@@ -17,21 +18,27 @@ public class MenuDialogs(CustomerService customerService, ProjectService project
     {
         while (true)
         {
-            
-            Console.WriteLine();
+            Console.WriteLine("\n***** Menu Options *****");
             Console.WriteLine("1.  Create New Customer");
             Console.WriteLine("2.  Create New Project");
-            Console.WriteLine("3.  Get All Customers");
-            Console.WriteLine("4.  Get All Projects");
-            Console.WriteLine("5.  Get Customer");
-            Console.WriteLine("6.  Get Project");
-            Console.WriteLine("7.  Create Product");
-            Console.WriteLine("8.  Create Status");
-            Console.WriteLine("9.  Create User");
+            Console.WriteLine("3.  Create New Product");
+            Console.WriteLine("4.  Create New Status");
+            Console.WriteLine("5.  Create New User");
+
+            Console.WriteLine("\n6.  Get Customer");
+            Console.WriteLine("7.  Get Project");
+
+            Console.WriteLine("\n8.  Get All Customers");
+            Console.WriteLine("9.  Get All Projects");
             Console.WriteLine("10. Get All Products");
             Console.WriteLine("11. Get All StatusType");
             Console.WriteLine("12. Get All Users");
-            Console.WriteLine("0.  Exit");
+
+            Console.WriteLine("\n13. Delete Project");
+            Console.WriteLine("14. Update Project");
+
+            Console.WriteLine("\n0.  Exit");
+            Console.WriteLine("**************************");
             Console.Write("\nChoose your option: ");
 
             var option = Console.ReadLine()!;
@@ -45,25 +52,25 @@ public class MenuDialogs(CustomerService customerService, ProjectService project
                     CreateProject();
                     break;
                 case "3":
-                    GetAllCustomers();
-                    break;
-                case "4":
-                    GetAllProjects();
-                    break;
-                case "5":
-                    GetCustomer();
-                    break;
-                case "6":
-                    GetProject();
-                    break;
-                case "7":
                     CreateProduct();
                     break;
-                case "8":
+                case "4":
                     CreateStatus();
                     break;
-                case "9":
+                case "5":
                     CreateUser();
+                    break;
+                case "6":
+                    GetCustomer();
+                    break;
+                case "7":
+                    GetProject();
+                    break;
+                case "8":
+                    GetAllCustomers();
+                    break;
+                case "9":
+                    GetAllProjects();
                     break;
                 case "10":
                     GetAllProducts();
@@ -73,6 +80,12 @@ public class MenuDialogs(CustomerService customerService, ProjectService project
                     break;
                 case "12":
                     GetAllUsers();
+                    break;
+                case "13":
+                    DeleteProject();
+                    break;
+                case "14":
+                    UpdateProject();
                     break;
                 case "0":
                     return;
@@ -605,6 +618,140 @@ public class MenuDialogs(CustomerService customerService, ProjectService project
             Console.WriteLine($"User Details:: Id: {user?.Id}, Name: {user?.FirstName} {user?.LastName}, Email: {user?.Email}");
         }
     }
+
+    public void DeleteProject()
+    {
+        Console.Clear();
+        Console.WriteLine("*** Delete Project ***");
+
+        GetAllProjects();
+        Console.Write("\nType Project Id: ");
+
+        int projectId;
+        if (!int.TryParse(Console.ReadLine(), out projectId))
+        {
+            Console.WriteLine("Invalid project id.");
+            return;
+        }
+
+        var optionBuilder = new DbContextOptionsBuilder<DataContext>();
+        optionBuilder
+            .UseLazyLoadingProxies()
+            .UseSqlServer("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=D:\\Cources\\DataStorage_Assignment\\Data\\Databases\\Local_Db.mdf;Integrated Security=True;Connect Timeout=30;Encrypt=True");
+
+        using (var datacontext = new DataContext(optionBuilder.Options))
+        {
+            var projectRepository = new ProjectRepository(datacontext);
+            var projectService = new ProjectService(projectRepository);
+            var isDeleted = projectService.DeleteProjectAsync(projectId).GetAwaiter().GetResult();
+            if (isDeleted)
+            {
+                Console.WriteLine("Project deleted successfully.");
+            }
+            else
+            {
+                Console.WriteLine("Project not found.");
+            }
+        }
+
+    }
+
+    public void UpdateProject()
+    {
+        Console.Clear();
+        Console.WriteLine("*** Update Project ***");
+
+        GetAllProjects();
+        Console.Write("\nType Project Id: ");
+        if (!int.TryParse(Console.ReadLine(), out int projectId))
+        {
+            Console.WriteLine("Invalid project id.");
+            return;
+        }
+
+
+        var optionsBuilder = new DbContextOptionsBuilder<DataContext>();
+        optionsBuilder
+            .UseLazyLoadingProxies()
+            .UseSqlServer("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=D:\\Cources\\DataStorage_Assignment\\Data\\Databases\\Local_Db.mdf;Integrated Security=True;Connect Timeout=30;Encrypt=True");
+
+        using (var checkContext = new DataContext(optionsBuilder.Options))
+        {
+            var existingProject = checkContext.Projects.FirstOrDefault(x => x.Id == projectId);
+            if (existingProject == null)
+            {
+                Console.WriteLine("Project not found. Please try again.");
+                Console.WriteLine("\nPress any key to return to the menu.");
+                Console.ReadKey();
+                return;
+            }
+            else
+            {
+                Console.WriteLine("Project found. You can update project's information.");
+            }
+        }
+
+        Console.Write("Project Title: ");
+        string projectTitle = Console.ReadLine()!;
+
+        Console.Write("Project Description: ");
+        string projectDescription = Console.ReadLine()!;
+
+        Console.Write("Start Date (YYYY-MM-DD): ");
+        DateTime startDate = Convert.ToDateTime(Console.ReadLine()!);
+
+        Console.Write("End Date (YYYY-MM-DD): ");
+        DateTime endDate = Convert.ToDateTime(Console.ReadLine()!);
+
+        GetAllCustomers();
+        Console.Write("\nType Customer Id: ");
+        int customerId = Convert.ToInt32(Console.ReadLine()!);
+
+        GetAllStatus();
+        Console.Write("\nType Status Id: ");
+        int statusId = Convert.ToInt32(Console.ReadLine()!);
+
+        GetAllUsers();
+        Console.Write("\nType User Id: ");
+        int userId = Convert.ToInt32(Console.ReadLine()!);
+
+        GetAllProducts();
+        Console.Write("\nType Product Id: ");
+        int productId = Convert.ToInt32(Console.ReadLine()!);
+
+        var registrationForm = new ProjectRegistrationForm
+        {
+            Title = projectTitle,
+            Description = projectDescription,
+            StartDate = startDate,
+            EndDate = endDate,
+            CustomerId = customerId,
+            StatusId = statusId,
+            UserID = userId,
+            ProductID = productId
+        };
+
+        using (var updateContext = new DataContext(optionsBuilder.Options))
+        {
+            var projectRepository = new ProjectRepository(updateContext);
+            var projectService = new ProjectService(projectRepository);
+
+            var isUpdated = projectService.UpdateProjectAsync(projectId, registrationForm).GetAwaiter().GetResult();
+
+            if (isUpdated)
+            {
+                Console.WriteLine("Project updated successfully.");
+            }
+            else
+            {
+                Console.WriteLine("Project update failed. Please check the details and try again.");
+            }
+        }
+
+        Console.WriteLine("\nPress any key to return to the menu.");
+        Console.ReadKey();
+    }
+
 
 
 }

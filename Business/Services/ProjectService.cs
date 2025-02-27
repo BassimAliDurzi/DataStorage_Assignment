@@ -34,9 +34,10 @@ public class ProjectService(ProjectRepository projectRepository)
         return ProjectFactory.Create(projectEntity!);
     }
 
-    public async Task<bool> UpdateProjectAsync(ProjectRegistrationForm form)
+    public async Task<bool> UpdateProjectAsync(int projectId, ProjectRegistrationForm form)
     {
         var projectEntity = ProjectFactory.Create(form);
+        projectEntity.Id = projectId;
         return await _projectRepository.UpdateAsync(projectEntity!);
     }
 
